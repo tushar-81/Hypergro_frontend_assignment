@@ -27,9 +27,9 @@ export const FormPreview: React.FC = () => {
       setCurrentStep(0);
     }
   }, [currentForm]);
-
   if (!currentForm) {
-    return (      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-96 p-4 h-full flex items-center justify-center">
+    return (
+      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-full md:w-96 p-4 h-full flex items-center justify-center">
         <div className="text-center text-gray-500 dark:text-gray-400">
           <p className="text-sm">No form to preview</p>
         </div>
@@ -160,9 +160,9 @@ export const FormPreview: React.FC = () => {
   const totalSteps = getTotalSteps();
   const currentFields = getCurrentStepFields();
   const progress = currentForm.isMultiStep ? ((currentStep + 1) / totalSteps) * 100 : 100;  return (
-    <div className="bg-gray-100 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 w-96 p-4 h-full overflow-y-auto">
+    <div className="bg-gray-100 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 w-full md:w-96 p-3 md:p-4 h-full overflow-y-auto">
       {/* Preview Mode Selector */}
-      <div className="mb-4">
+      <div className="mb-3 md:mb-4">
         <div className="flex items-center justify-center space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
           {[
             { mode: 'desktop' as PreviewMode, icon: Monitor },
@@ -187,15 +187,15 @@ export const FormPreview: React.FC = () => {
       </div>
 
       {/* Responsive Preview Container */}
-      <div className="flex justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-4 min-h-[500px] overflow-auto">
+      <div className="flex justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-2 md:p-4 min-h-[400px] md:min-h-[500px] overflow-auto">
         <div
-          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 overflow-hidden"
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 overflow-hidden w-full max-w-full"
           style={getPreviewContainerStyle()}
         >
-          <form onSubmit={handleSubmit} className="p-6 h-full">
+          <form onSubmit={handleSubmit} className="p-4 md:p-6 h-full">
             {/* Form Header */}
-            <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
+            <div className="mb-4 md:mb-6">
+              <h2 className="text-lg md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {getStepTitle(currentStep)}
               </h2>
               {getStepDescription(currentStep) && (

@@ -29,16 +29,20 @@ export const FieldPalette: React.FC = () => {
     dispatch({ type: 'ADD_FIELD', payload: newField });
     dispatch({ type: 'SELECT_FIELD', payload: newField });
   };
-
-  return (    <div className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-64 p-4 h-full overflow-y-auto">
-      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Field Components</h3>
+  return (
+    <div className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-full md:w-64 p-3 md:p-4 h-full overflow-y-auto">
+      <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3 md:mb-4">
+        <span className="hidden md:inline">Field Components</span>
+        <span className="md:hidden">Add Fields</span>
+      </h3>
       
       <div className="space-y-2">
         {fieldTypes.map((fieldType) => (
           <button
             key={fieldType.type}
-            onClick={() => handleAddField(fieldType.type)}            className={clsx(
-              'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600',
+            onClick={() => handleAddField(fieldType.type)}
+            className={clsx(
+              'w-full text-left p-2 md:p-3 rounded-lg border border-gray-200 dark:border-gray-600',
               'hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
               'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
               'bg-white dark:bg-gray-700',
@@ -46,16 +50,18 @@ export const FieldPalette: React.FC = () => {
             )}
             disabled={!state.currentForm}
           >
-            <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">                <Icon 
+            <div className="flex items-center space-x-2 md:space-x-3">
+              <div className="flex-shrink-0">
+                <Icon 
                   name={getFieldIcon(fieldType.type)} 
-                  className="h-5 w-5 text-gray-600 dark:text-gray-400" 
+                  className="h-4 w-4 md:h-5 md:w-5 text-gray-600 dark:text-gray-400" 
                 />
               </div>
-              <div className="flex-1 min-w-0">                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+              <div className="flex-1 min-w-0">
+                <p className="text-sm md:text-base font-medium text-gray-900 dark:text-gray-100 truncate">
                   {fieldType.label}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                <p className="hidden md:block text-xs text-gray-500 dark:text-gray-400 truncate">
                   {fieldType.description}
                 </p>
               </div>
@@ -63,8 +69,10 @@ export const FieldPalette: React.FC = () => {
           </button>
         ))}
       </div>
-        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
-        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h4>
+
+      {/* Quick Actions */}
+      <div className="mt-4 md:mt-6 pt-3 md:pt-4 border-t border-gray-200 dark:border-gray-600">
+        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-2 md:mb-3">Quick Actions</h4>
         <div className="space-y-2">
           <button
             onClick={() => dispatch({ type: 'CREATE_NEW_FORM' })}
@@ -73,7 +81,8 @@ export const FieldPalette: React.FC = () => {
             Create New Form
           </button>
           <button
-            onClick={() => dispatch({ type: 'TOGGLE_MULTI_STEP' })}            className={clsx(
+            onClick={() => dispatch({ type: 'TOGGLE_MULTI_STEP' })}
+            className={clsx(
               'w-full text-left p-2 text-sm rounded-md transition-colors',
               state.currentForm?.isMultiStep 
                 ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20' 
@@ -82,7 +91,12 @@ export const FieldPalette: React.FC = () => {
             )}
             disabled={!state.currentForm}
           >
-            {state.currentForm?.isMultiStep ? 'Disable Multi-Step' : 'Enable Multi-Step'}
+            <span className="hidden md:inline">
+              {state.currentForm?.isMultiStep ? 'Disable Multi-Step' : 'Enable Multi-Step'}
+            </span>
+            <span className="md:hidden">
+              {state.currentForm?.isMultiStep ? 'Single Step' : 'Multi-Step'}
+            </span>
           </button>
         </div>
       </div>

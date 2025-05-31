@@ -9,12 +9,15 @@ import clsx from 'clsx';
 export const FieldPropertyPanel: React.FC = () => {
   const { state, dispatch } = useFormBuilder();
   const { selectedField } = state;
-
   if (!selectedField) {
-    return (      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-80 p-4 h-full flex items-center justify-center">
+    return (
+      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-full md:w-80 p-4 h-full flex items-center justify-center">
         <div className="text-center text-gray-500 dark:text-gray-400">
-          <Icon name="Settings" className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
-          <p className="text-sm">Select a field to edit its properties</p>
+          <Icon name="Settings" className="h-8 w-8 md:h-12 md:w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
+          <p className="text-sm">
+            <span className="hidden md:inline">Select a field to edit its properties</span>
+            <span className="md:hidden">Select a field to edit properties</span>
+          </p>
         </div>
       </div>
     );
@@ -51,17 +54,19 @@ export const FieldPropertyPanel: React.FC = () => {
     updateField({ options: updatedOptions });
   };
 
-  const hasOptions = selectedField.type === 'dropdown' || selectedField.type === 'radio';
-  return (
-    <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-80 p-4 h-full overflow-y-auto">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Field Properties</h3>
-        <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-2 rounded">
+  const hasOptions = selectedField.type === 'dropdown' || selectedField.type === 'radio';  return (
+    <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-full md:w-80 p-3 md:p-4 h-full overflow-y-auto">
+      <div className="mb-3 md:mb-4">
+        <h3 className="text-base md:text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <span className="hidden md:inline">Field Properties</span>
+          <span className="md:hidden">Properties</span>
+        </h3>
+        <div className="text-xs md:text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-2 rounded">
           {selectedField.type.charAt(0).toUpperCase() + selectedField.type.slice(1)} Field
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         {/* Basic Properties */}
         <div>
           <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">

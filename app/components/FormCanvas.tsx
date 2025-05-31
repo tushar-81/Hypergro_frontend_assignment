@@ -46,13 +46,13 @@ export const FormCanvas: React.FC = () => {
   const handleDragStart = () => {
     dispatch({ type: 'SET_IS_DRAGGING', payload: true });
   };
-
   if (!currentForm) {
-    return (      <div className="flex-1 bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+    return (
+      <div className="flex-1 bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4">
         <div className="text-center">
-          <Icon name="FileText" className="h-24 w-24 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">No Form Selected</h3>
-          <p className="text-gray-500 dark:text-gray-400 mb-6">Create a new form or select an existing one to start building</p>
+          <Icon name="FileText" className="h-16 w-16 md:h-24 md:w-24 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-lg md:text-xl font-medium text-gray-900 dark:text-gray-100 mb-2">No Form Selected</h3>
+          <p className="text-sm md:text-base text-gray-500 dark:text-gray-400 mb-6">Create a new form or select an existing one to start building</p>
           <button
             onClick={() => dispatch({ type: 'CREATE_NEW_FORM' })}
             className="px-4 py-2 bg-blue-600 dark:bg-blue-500 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
@@ -64,11 +64,12 @@ export const FormCanvas: React.FC = () => {
     );
   }
 
-  return (    <div className="flex-1 bg-gray-50 dark:bg-gray-900 p-6 overflow-y-auto">
+  return (
+    <div className="flex-1 bg-gray-50 dark:bg-gray-900 p-3 md:p-6 overflow-y-auto">
       <div className="max-w-2xl mx-auto">
         {/* Form Header */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg p-6 mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
-          <div className="space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg p-4 md:p-6 mb-4 md:mb-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="space-y-3 md:space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Form Title
@@ -100,8 +101,8 @@ export const FormCanvas: React.FC = () => {
                 placeholder="Enter form description..."
               />
             </div>            <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-600">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center space-x-2 md:space-x-4">
+                <span className="text-xs md:text-sm text-gray-600 dark:text-gray-400">
                   {currentForm.fields.length} field{currentForm.fields.length !== 1 ? 's' : ''}
                 </span>
                 {currentForm.isMultiStep && (
@@ -111,19 +112,19 @@ export const FormCanvas: React.FC = () => {
                 )}
               </div>
               
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
                 ID: {currentForm.id}
               </div>
             </div>
           </div>
-        </div>
-
-        {/* Fields */}
-        {currentForm.fields.length === 0 ? (          <div className="bg-white dark:bg-gray-800 rounded-lg p-12 text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
-            <Icon name="Plus" className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Add Your First Field</h3>
-            <p className="text-gray-500 dark:text-gray-400">
-              Select a field type from the left panel to start building your form
+        </div>        {/* Fields */}
+        {currentForm.fields.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-8 md:p-12 text-center border-2 border-dashed border-gray-300 dark:border-gray-600">
+            <Icon name="Plus" className="h-8 w-8 md:h-12 md:w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+            <h3 className="text-base md:text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Add Your First Field</h3>
+            <p className="text-sm md:text-base text-gray-500 dark:text-gray-400">
+              <span className="hidden md:inline">Select a field type from the left panel to start building your form</span>
+              <span className="md:hidden">Tap "Fields" below to add form fields</span>
             </p>
           </div>
         ) : (

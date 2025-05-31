@@ -145,16 +145,15 @@ export const FormFiller: React.FC<FormFillerProps> = ({
   const getStepDescription = (step: number) => {
     if (!form.isMultiStep) return form.description;
     return form.steps?.[step]?.description;
-  };
-  if (isSubmitted) {
+  };  if (isSubmitted) {
     return (
-      <div className={clsx('max-w-2xl mx-auto p-6', className)}>
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+      <div className={clsx('max-w-2xl mx-auto p-4 md:p-6', className)}>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8 text-center">
           <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 dark:bg-green-900 mb-4">
             <Check className="h-6 w-6 text-green-600 dark:text-green-400" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Thank You!</h2>
-          <p className="text-gray-600 dark:text-gray-300 mb-6">
+          <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">Thank You!</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-6 text-sm md:text-base">
             Your form has been submitted successfully. We'll get back to you soon.
           </p>
           <button
@@ -171,7 +170,7 @@ export const FormFiller: React.FC<FormFillerProps> = ({
               });
               setFormData(initialData);
             }}
-            className="px-6 py-2 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors"
+            className="px-6 py-3 bg-blue-600 dark:bg-blue-700 text-white rounded-md hover:bg-blue-700 dark:hover:bg-blue-600 transition-colors text-sm md:text-base min-h-[44px]"
           >
             Submit Another Response
           </button>
@@ -182,22 +181,21 @@ export const FormFiller: React.FC<FormFillerProps> = ({
 
   const totalSteps = getTotalSteps();
   const currentFields = getCurrentStepFields();
-  const progress = form.isMultiStep ? ((currentStep + 1) / totalSteps) * 100 : 100;
-  return (
-    <div className={clsx('max-w-2xl mx-auto p-6', className)}>
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
+  const progress = form.isMultiStep ? ((currentStep + 1) / totalSteps) * 100 : 100;  return (
+    <div className={clsx('max-w-2xl mx-auto p-4 md:p-6', className)}>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 md:p-8">
         <form onSubmit={handleSubmit}>
           {/* Form Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+          <div className="mb-6 md:mb-8">
+            <h1 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3 md:mb-4">
               {getStepTitle(currentStep)}
             </h1>
             {getStepDescription(currentStep) && (
-              <p className="text-lg text-gray-600 dark:text-gray-300">{getStepDescription(currentStep)}</p>
+              <p className="text-base md:text-lg text-gray-600 dark:text-gray-300">{getStepDescription(currentStep)}</p>
             )}
           </div>          {/* Progress Bar (Multi-step only) */}
           {form.isMultiStep && (
-            <div className="mb-8">
+            <div className="mb-6 md:mb-8">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                   Step {currentStep + 1} of {totalSteps}
@@ -216,7 +214,7 @@ export const FormFiller: React.FC<FormFillerProps> = ({
           )}
 
           {/* Form Fields */}
-          <div className="space-y-8">
+          <div className="space-y-6 md:space-y-8">
             {currentFields.map(field => (
               <FieldRenderer
                 key={field.id}
@@ -226,7 +224,7 @@ export const FormFiller: React.FC<FormFillerProps> = ({
                 error={touchedFields.has(field.id) ? errors[field.id] : undefined}
               />
             ))}
-          </div>          {/* Error Summary */}
+          </div>{/* Error Summary */}
           {Object.keys(errors).length > 0 && (
             <div className="mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
               <div className="flex">
@@ -249,18 +247,18 @@ export const FormFiller: React.FC<FormFillerProps> = ({
               </div>
             </div>
           )}          {/* Navigation Buttons */}
-          <div className="mt-10 flex justify-between">
+          <div className="mt-8 md:mt-10 flex flex-col sm:flex-row justify-between space-y-3 sm:space-y-0">
             {form.isMultiStep && currentStep > 0 ? (
               <button
                 type="button"
                 onClick={handlePrevStep}
-                className="flex items-center space-x-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium"
+                className="flex items-center justify-center space-x-2 px-6 py-3 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors font-medium min-h-[44px] w-full sm:w-auto"
               >
                 <ArrowLeft className="h-5 w-5" />
                 <span>Previous</span>
               </button>
             ) : (
-              <div />
+              <div className="hidden sm:block" />
             )}
 
             {form.isMultiStep && currentStep < totalSteps - 1 ? (
@@ -269,7 +267,7 @@ export const FormFiller: React.FC<FormFillerProps> = ({
                 onClick={handleNextStep}
                 disabled={!canProceedToNextStep()}
                 className={clsx(
-                  'flex items-center space-x-2 px-6 py-3 rounded-md transition-colors font-medium',
+                  'flex items-center justify-center space-x-2 px-6 py-3 rounded-md transition-colors font-medium min-h-[44px] w-full sm:w-auto',
                   canProceedToNextStep()
                     ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
                     : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
@@ -283,7 +281,7 @@ export const FormFiller: React.FC<FormFillerProps> = ({
                 type="submit"
                 disabled={isSubmitting}
                 className={clsx(
-                  'flex items-center space-x-2 px-8 py-3 rounded-md transition-colors font-medium',
+                  'flex items-center justify-center space-x-2 px-8 py-3 rounded-md transition-colors font-medium min-h-[44px] w-full sm:w-auto',
                   isSubmitting
                     ? 'bg-gray-400 dark:bg-gray-600 text-white cursor-not-allowed'
                     : 'bg-green-600 dark:bg-green-700 text-white hover:bg-green-700 dark:hover:bg-green-600'

@@ -20,9 +20,10 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
   disabled = false,
   className,
 }) => {  const baseInputClasses = clsx(
-    'w-full rounded-md border px-3 py-2 text-sm transition-colors',
+    'w-full rounded-md border px-3 py-3 md:py-2 text-sm md:text-base transition-colors',
     'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
     'bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+    'min-h-[44px] md:min-h-[36px]', // Ensure minimum touch target size on mobile
     error 
       ? 'border-red-300 dark:border-red-600 bg-red-50 dark:bg-red-900/20 focus:ring-red-500' 
       : 'border-gray-300 dark:border-gray-600 focus:border-blue-500',
@@ -48,15 +49,14 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
             maxLength={field.validation.maxLength}
           />
         );
-      
-      case 'textarea':
+        case 'textarea':
         return (
           <textarea
             value={value || ''}
             onChange={(e) => onChange(e.target.value)}
             placeholder={field.placeholder}
             disabled={disabled}
-            className={clsx(baseInputClasses, 'min-h-[100px] resize-vertical')}
+            className={clsx(baseInputClasses, 'min-h-[120px] md:min-h-[100px] resize-vertical')}
             required={field.validation.required}
             minLength={field.validation.minLength}
             maxLength={field.validation.maxLength}
@@ -108,35 +108,35 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
             ))}
           </select>
         );
-      
-      case 'radio':
+        case 'radio':
         return (
-          <div className="space-y-2">
+          <div className="space-y-3 md:space-y-2">
             {field.options?.map((option) => (
-              <label key={option.id} className="flex items-center space-x-2 cursor-pointer">
+              <label key={option.id} className="flex items-center space-x-3 md:space-x-2 cursor-pointer">
                 <input
                   type="radio"
                   name={field.id}
                   value={option.value}
                   checked={value === option.value}
                   onChange={(e) => onChange(e.target.value)}
-                  disabled={disabled}                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+                  disabled={disabled}
+                  className="h-5 w-5 md:h-4 md:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
+                <span className="text-sm md:text-sm text-gray-700 dark:text-gray-300">{option.label}</span>
               </label>
             ))}
           </div>
-        );
-        case 'checkbox':
+        );        case 'checkbox':
         return (
-          <label className="flex items-center space-x-2 cursor-pointer">
+          <label className="flex items-center space-x-3 md:space-x-2 cursor-pointer">
             <input
               type="checkbox"
               checked={value || false}
               onChange={(e) => onChange(e.target.checked)}
-              disabled={disabled}              className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
+              disabled={disabled}
+              className="h-5 w-5 md:h-4 md:w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 dark:bg-gray-700 rounded"
             />
-            <span className="text-sm text-gray-700 dark:text-gray-300">
+            <span className="text-sm md:text-sm text-gray-700 dark:text-gray-300">
               {field.label}
               {field.validation.required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
             </span>
@@ -147,10 +147,10 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
         return null;
     }
   };
-
   return (
-    <div className="space-y-2">      {field.type !== 'checkbox' && (
-        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+    <div className="space-y-3 md:space-y-2">
+      {field.type !== 'checkbox' && (
+        <label className="block text-sm md:text-sm font-medium text-gray-700 dark:text-gray-300">
           {field.label}
           {field.validation.required && <span className="text-red-500 dark:text-red-400 ml-1">*</span>}
         </label>
@@ -159,11 +159,11 @@ export const FieldRenderer: React.FC<FieldRendererProps> = ({
       {renderField()}
       
       {field.helpText && (
-        <p className="text-xs text-gray-500 dark:text-gray-400">{field.helpText}</p>
+        <p className="text-xs md:text-xs text-gray-500 dark:text-gray-400">{field.helpText}</p>
       )}
       
       {error && (
-        <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        <p className="text-xs md:text-xs text-red-600 dark:text-red-400">{error}</p>
       )}
     </div>
   );

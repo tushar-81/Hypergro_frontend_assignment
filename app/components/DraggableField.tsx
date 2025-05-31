@@ -70,6 +70,7 @@ export const DraggableField: React.FC<DraggableFieldProps> = ({
       ref={setNodeRef}
       style={style}      className={clsx(
         'bg-white dark:bg-gray-800 border rounded-lg p-4 cursor-pointer transition-all duration-200',
+        'touch-manipulation', // Improve touch performance
         isSelected 
           ? 'border-blue-500 ring-2 ring-blue-200 dark:ring-blue-800 shadow-md' 
           : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-sm',
@@ -81,9 +82,9 @@ export const DraggableField: React.FC<DraggableFieldProps> = ({
         <div className="flex items-center space-x-2">          <div
             {...attributes}
             {...listeners}
-            className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
+            className="cursor-grab active:cursor-grabbing p-2 md:p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded touch-manipulation"
           >
-            <GripVertical className="h-4 w-4 text-gray-400 dark:text-gray-500" />
+            <GripVertical className="h-5 w-5 md:h-4 md:w-4 text-gray-400 dark:text-gray-500" />
           </div>
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
             {field.label}
@@ -95,17 +96,17 @@ export const DraggableField: React.FC<DraggableFieldProps> = ({
         
         <div className="flex items-center space-x-1">          <button
             onClick={handleSelect}
-            className="p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded transition-colors"
+            className="p-2 md:p-1 hover:bg-blue-100 dark:hover:bg-blue-900/20 rounded transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center"
             title="Edit field"
           >
-            <Edit3 className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+            <Edit3 className="h-5 w-5 md:h-4 md:w-4 text-blue-600 dark:text-blue-400" />
           </button>
           <button
             onClick={handleDelete}
-            className="p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors"
+            className="p-2 md:p-1 hover:bg-red-100 dark:hover:bg-red-900/20 rounded transition-colors min-h-[44px] md:min-h-[32px] min-w-[44px] md:min-w-[32px] flex items-center justify-center"
             title="Delete field"
           >
-            <Trash2 className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <Trash2 className="h-5 w-5 md:h-4 md:w-4 text-red-600 dark:text-red-400" />
           </button>
         </div>
       </div>
