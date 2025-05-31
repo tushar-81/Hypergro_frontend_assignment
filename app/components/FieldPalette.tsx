@@ -30,35 +30,32 @@ export const FieldPalette: React.FC = () => {
     dispatch({ type: 'SELECT_FIELD', payload: newField });
   };
 
-  return (
-    <div className="bg-white border-r border-gray-200 w-64 p-4 h-full overflow-y-auto">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">Field Components</h3>
+  return (    <div className="bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 w-64 p-4 h-full overflow-y-auto">
+      <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Field Components</h3>
       
       <div className="space-y-2">
         {fieldTypes.map((fieldType) => (
           <button
             key={fieldType.type}
-            onClick={() => handleAddField(fieldType.type)}
-            className={clsx(
-              'w-full text-left p-3 rounded-lg border border-gray-200',
-              'hover:border-blue-300 hover:bg-blue-50 transition-colors',
+            onClick={() => handleAddField(fieldType.type)}            className={clsx(
+              'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600',
+              'hover:border-blue-300 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors',
               'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent',
+              'bg-white dark:bg-gray-700',
               !state.currentForm && 'opacity-50 cursor-not-allowed'
             )}
             disabled={!state.currentForm}
           >
             <div className="flex items-center space-x-3">
-              <div className="flex-shrink-0">
-                <Icon 
+              <div className="flex-shrink-0">                <Icon 
                   name={getFieldIcon(fieldType.type)} 
-                  className="h-5 w-5 text-gray-600" 
+                  className="h-5 w-5 text-gray-600 dark:text-gray-400" 
                 />
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+              <div className="flex-1 min-w-0">                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
                   {fieldType.label}
                 </p>
-                <p className="text-xs text-gray-500 truncate">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                   {fieldType.description}
                 </p>
               </div>
@@ -66,23 +63,21 @@ export const FieldPalette: React.FC = () => {
           </button>
         ))}
       </div>
-      
-      <div className="mt-6 pt-4 border-t border-gray-200">
-        <h4 className="text-sm font-medium text-gray-900 mb-3">Quick Actions</h4>
+        <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-600">
+        <h4 className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Quick Actions</h4>
         <div className="space-y-2">
           <button
             onClick={() => dispatch({ type: 'CREATE_NEW_FORM' })}
-            className="w-full text-left p-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            className="w-full text-left p-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
           >
             Create New Form
           </button>
           <button
-            onClick={() => dispatch({ type: 'TOGGLE_MULTI_STEP' })}
-            className={clsx(
+            onClick={() => dispatch({ type: 'TOGGLE_MULTI_STEP' })}            className={clsx(
               'w-full text-left p-2 text-sm rounded-md transition-colors',
               state.currentForm?.isMultiStep 
-                ? 'text-orange-600 hover:bg-orange-50' 
-                : 'text-green-600 hover:bg-green-50',
+                ? 'text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/20' 
+                : 'text-green-600 dark:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20',
               !state.currentForm && 'opacity-50 cursor-not-allowed'
             )}
             disabled={!state.currentForm}

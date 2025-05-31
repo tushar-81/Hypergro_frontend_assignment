@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useFormBuilder } from '~/context/FormBuilderContext';
 import { FieldRenderer } from './FieldRenderer';
 import { validateForm, getFieldDefaultValue } from '~/utils/validation';
-import { PreviewMode } from '~/types/form';
+import { PreviewMode, FormSubmission } from '~/types/form';
 import { Monitor, Tablet, Smartphone, ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { v4 as uuidv4 } from 'uuid';
 import clsx from 'clsx';
 
 export const FormPreview: React.FC = () => {
@@ -28,9 +29,8 @@ export const FormPreview: React.FC = () => {
   }, [currentForm]);
 
   if (!currentForm) {
-    return (
-      <div className="bg-white border-l border-gray-200 w-96 p-4 h-full flex items-center justify-center">
-        <div className="text-center text-gray-500">
+    return (      <div className="bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 w-96 p-4 h-full flex items-center justify-center">
+        <div className="text-center text-gray-500 dark:text-gray-400">
           <p className="text-sm">No form to preview</p>
         </div>
       </div>
@@ -89,7 +89,6 @@ export const FormPreview: React.FC = () => {
   const handlePrevStep = () => {
     setCurrentStep(prev => Math.max(prev - 1, 0));
   };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -98,7 +97,34 @@ export const FormPreview: React.FC = () => {
     
     if (Object.keys(allErrors).length === 0) {
       // Form is valid, handle submission
+      const submission = {
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 9),
+        formId: currentForm.id,
+        data: formData,
+        submittedAt: new Date(),
+      };
+
+      // Save submission to localStorage
+      const existingSubmissions = JSON.parse(
+        localStorage.getItem(`submissions_${currentForm.id}`) || '[]'
+      );
+      existingSubmissions.push(submission);
+      localStorage.setItem(
+        `submissions_${currentForm.id}`, 
+        JSON.stringify(existingSubmissions)
+      );
+
       alert('Form submitted successfully!\\n\\nData: ' + JSON.stringify(formData, null, 2));
+      
+      // Reset form after successful submission
+      const initialData: Record<string, any> = {};
+      currentForm.fields.forEach(field => {
+        initialData[field.id] = getFieldDefaultValue(field);
+      });
+      setFormData(initialData);
+      setErrors({});
+      setTouchedFields(new Set());
+      setCurrentStep(0);
     } else {
       // Mark all fields as touched to show errors
       const allFieldIds = new Set(currentForm.fields.map(f => f.id));
@@ -120,31 +146,26 @@ export const FormPreview: React.FC = () => {
   const getStepDescription = (step: number) => {
     if (!currentForm.isMultiStep) return currentForm.description;
     return currentForm.steps?.[step]?.description;
-  };
-
-  const getPreviewContainerClasses = () => {
-    const baseClasses = 'mx-auto bg-white rounded-lg shadow-lg transition-all duration-300';
-    
+  };  const getPreviewContainerStyle = () => {
     switch (previewMode) {
       case 'mobile':
-        return clsx(baseClasses, 'max-w-sm');
+        return { width: '375px', maxWidth: '375px' };
       case 'tablet':
-        return clsx(baseClasses, 'max-w-md');
+        return { width: '768px', maxWidth: '768px' };
       default:
-        return clsx(baseClasses, 'max-w-2xl');
+        return { width: '100%', maxWidth: '1024px' };
     }
   };
 
   const totalSteps = getTotalSteps();
   const currentFields = getCurrentStepFields();
-  const progress = currentForm.isMultiStep ? ((currentStep + 1) / totalSteps) * 100 : 100;
-
-  return (
-    <div className="bg-gray-100 border-l border-gray-200 w-96 p-4 h-full overflow-y-auto">
+  const progress = currentForm.isMultiStep ? ((currentStep + 1) / totalSteps) * 100 : 100;  return (
+    <div className="bg-gray-100 dark:bg-gray-900 border-l border-gray-200 dark:border-gray-700 w-96 p-4 h-full overflow-y-auto">
       {/* Preview Mode Selector */}
       <div className="mb-4">
-        <div className="flex items-center justify-center space-x-1 bg-white rounded-lg p-1 shadow-sm">
-          {[            { mode: 'desktop' as PreviewMode, icon: Monitor },
+        <div className="flex items-center justify-center space-x-1 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
+          {[
+            { mode: 'desktop' as PreviewMode, icon: Monitor },
             { mode: 'tablet' as PreviewMode, icon: Tablet },
             { mode: 'mobile' as PreviewMode, icon: Smartphone },
           ].map(({ mode, icon: Icon }) => (
@@ -155,7 +176,7 @@ export const FormPreview: React.FC = () => {
                 'flex items-center justify-center p-2 rounded-md transition-colors',
                 previewMode === mode
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:bg-gray-100'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
               )}
               title={`${mode} preview`}
             >
@@ -165,17 +186,20 @@ export const FormPreview: React.FC = () => {
         </div>
       </div>
 
-      {/* Form Preview */}
-      <div className="relative">
-        <div className={getPreviewContainerClasses()}>
-          <form onSubmit={handleSubmit} className="p-6">
+      {/* Responsive Preview Container */}
+      <div className="flex justify-center bg-gray-50 dark:bg-gray-800 rounded-lg p-4 min-h-[500px] overflow-auto">
+        <div
+          className="bg-white dark:bg-gray-800 rounded-lg shadow-lg transition-all duration-300 overflow-hidden"
+          style={getPreviewContainerStyle()}
+        >
+          <form onSubmit={handleSubmit} className="p-6 h-full">
             {/* Form Header */}
             <div className="mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {getStepTitle(currentStep)}
               </h2>
               {getStepDescription(currentStep) && (
-                <p className="text-gray-600">{getStepDescription(currentStep)}</p>
+                <p className="text-gray-600 dark:text-gray-400">{getStepDescription(currentStep)}</p>
               )}
             </div>
 
@@ -183,16 +207,16 @@ export const FormPreview: React.FC = () => {
             {currentForm.isMultiStep && (
               <div className="mb-6">
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     Step {currentStep + 1} of {totalSteps}
                   </span>
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
                     {Math.round(progress)}% Complete
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                   <div
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    className="bg-blue-600 dark:bg-blue-500 h-2 rounded-full transition-all duration-300"
                     style={{ width: `${progress}%` }}
                   />
                 </div>
@@ -218,7 +242,7 @@ export const FormPreview: React.FC = () => {
                 <button
                   type="button"
                   onClick={handlePrevStep}
-                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 bg-gray-100 rounded-md hover:bg-gray-200 transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                 >
                   <ArrowLeft className="h-4 w-4" />
                   <span>Previous</span>
@@ -235,8 +259,8 @@ export const FormPreview: React.FC = () => {
                   className={clsx(
                     'flex items-center space-x-2 px-4 py-2 rounded-md transition-colors',
                     canProceedToNextStep()
-                      ? 'bg-blue-600 text-white hover:bg-blue-700'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                      ? 'bg-blue-600 dark:bg-blue-700 text-white hover:bg-blue-700 dark:hover:bg-blue-600'
+                      : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
                   )}
                 >
                   <span>Next</span>
@@ -245,7 +269,7 @@ export const FormPreview: React.FC = () => {
               ) : (
                 <button
                   type="submit"
-                  className="flex items-center space-x-2 px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                  className="flex items-center space-x-2 px-6 py-2 bg-green-600 dark:bg-green-700 text-white rounded-md hover:bg-green-700 dark:hover:bg-green-600 transition-colors"
                 >
                   <Check className="h-4 w-4" />
                   <span>Submit</span>
@@ -256,13 +280,17 @@ export const FormPreview: React.FC = () => {
         </div>
       </div>
 
-      {/* Form Info */}
-      <div className="mt-4 text-xs text-gray-500 bg-white p-3 rounded-lg">
+      {/* Preview Mode Info */}
+      <div className="mt-4 text-xs text-gray-500 bg-white dark:bg-gray-800 p-3 rounded-lg">
         <div className="space-y-1">
           <div>Form ID: {currentForm.id}</div>
           <div>Fields: {currentForm.fields.length}</div>
           {currentForm.isMultiStep && <div>Steps: {totalSteps}</div>}
-          <div>Preview Mode: {previewMode}</div>
+          <div className="font-medium">Preview: {previewMode} ({
+            previewMode === 'mobile' ? '375px' : 
+            previewMode === 'tablet' ? '768px' : 
+            'max 1024px'
+          })</div>
         </div>
       </div>
     </div>

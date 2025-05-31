@@ -31,11 +31,17 @@ function FormLoader({ formId }: { formId: string }) {
   const [form, setForm] = useState<Form | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
   useEffect(() => {
     try {
       // Try to load the form from localStorage
-      const savedForm = localStorage.getItem(`form_${formId}`);
+      // First try with shared_form_ prefix (for shareable links)
+      let savedForm = localStorage.getItem(`shared_form_${formId}`);
+      
+      // If not found, try with form_ prefix (for other saved forms)
+      if (!savedForm) {
+        savedForm = localStorage.getItem(`form_${formId}`);
+      }
+      
       if (savedForm) {
         setForm(JSON.parse(savedForm));
       } else {

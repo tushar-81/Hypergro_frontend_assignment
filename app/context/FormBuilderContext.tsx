@@ -10,6 +10,10 @@ interface FormBuilderState {
   isDragging: boolean;
   savedForms: Form[];
   templates: FormTemplate[];
+  history: Form[];
+  historyIndex: number;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 type FormBuilderAction =
@@ -28,7 +32,9 @@ type FormBuilderAction =
   | { type: 'ADD_STEP'; payload: FormStep }
   | { type: 'UPDATE_STEP'; payload: { id: string; step: Partial<FormStep> } }
   | { type: 'DELETE_STEP'; payload: string }
-  | { type: 'TOGGLE_MULTI_STEP' };
+  | { type: 'TOGGLE_MULTI_STEP' }
+  | { type: 'UNDO' }
+  | { type: 'REDO' };
 
 const initialState: FormBuilderState = {
   currentForm: null,
@@ -38,14 +44,71 @@ const initialState: FormBuilderState = {
   isDragging: false,
   savedForms: [],
   templates: [],
+  history: [],
+  historyIndex: -1,
+  canUndo: false,
+  canRedo: false,
 };
 
-const formBuilderReducer = (state: FormBuilderState, action: FormBuilderAction): FormBuilderState => {
-  switch (action.type) {
-    case 'SET_CURRENT_FORM':
-      return { ...state, currentForm: action.payload };
+const MAX_HISTORY_SIZE = 50;
+
+// Helper function to add a state to history
+const addToHistory = (state: FormBuilderState, form: Form): FormBuilderState => {
+  if (!form) return state;
+  
+  // Create a deep copy of the form for history
+  const formSnapshot = JSON.parse(JSON.stringify(form));
+  
+  // Remove items after current index (when making new changes after undo)
+  const newHistory = state.history.slice(0, state.historyIndex + 1);
+  
+  // Add new state to history
+  newHistory.push(formSnapshot);
+  
+  // Limit history size
+  if (newHistory.length > MAX_HISTORY_SIZE) {
+    newHistory.shift();
+  } else {
+    // Only increment index if we didn't remove from the beginning
+    return {
+      ...state,
+      history: newHistory,
+      historyIndex: newHistory.length - 1,
+      canUndo: newHistory.length > 0,
+      canRedo: false,
+    };
+  }
+  
+  return {
+    ...state,
+    history: newHistory,
+    historyIndex: newHistory.length - 1,
+    canUndo: newHistory.length > 0,
+    canRedo: false,
+  };
+};
+
+// Helper function to check if an action should be added to history
+const shouldAddToHistory = (action: FormBuilderAction): boolean => {
+  return [
+    'ADD_FIELD',
+    'UPDATE_FIELD', 
+    'DELETE_FIELD',
+    'REORDER_FIELDS',
+    'TOGGLE_MULTI_STEP',
+    'SET_CURRENT_FORM'
+  ].includes(action.type);
+};
+
+const formBuilderReducer = (state: FormBuilderState, action: FormBuilderAction): FormBuilderState => {  switch (action.type) {
+    case 'SET_CURRENT_FORM': {
+      const newState = { ...state, currentForm: action.payload };
+      return shouldAddToHistory(action) && action.payload
+        ? addToHistory(newState, action.payload)
+        : newState;
+    }
     
-    case 'CREATE_NEW_FORM':
+    case 'CREATE_NEW_FORM': {
       const newForm: Form = {
         id: uuidv4(),
         title: 'Untitled Form',
@@ -55,57 +118,123 @@ const formBuilderReducer = (state: FormBuilderState, action: FormBuilderAction):
         createdAt: new Date(),
         updatedAt: new Date(),
       };
-      return { ...state, currentForm: newForm, selectedField: null };
+      const newState = { ...state, currentForm: newForm, selectedField: null };
+      return addToHistory(newState, newForm);
+    }
     
-    case 'ADD_FIELD':
+    case 'ADD_FIELD': {
       if (!state.currentForm) return state;
-      return {
-        ...state,
-        currentForm: {
-          ...state.currentForm,
-          fields: [...state.currentForm.fields, action.payload],
-          updatedAt: new Date(),
-        },
+      const updatedForm = {
+        ...state.currentForm,
+        fields: [...state.currentForm.fields, action.payload],
+        updatedAt: new Date(),
       };
-    
-    case 'UPDATE_FIELD':
-      if (!state.currentForm) return state;
-      return {
+      const newState = {
         ...state,
-        currentForm: {
-          ...state.currentForm,
-          fields: state.currentForm.fields.map(field =>
-            field.id === action.payload.id ? { ...field, ...action.payload.field } : field
-          ),
-          updatedAt: new Date(),
-        },
+        currentForm: updatedForm,
+      };
+      return addToHistory(newState, updatedForm);
+    }
+    
+    case 'UPDATE_FIELD': {
+      if (!state.currentForm) return state;
+      const updatedForm = {
+        ...state.currentForm,
+        fields: state.currentForm.fields.map(field =>
+          field.id === action.payload.id ? { ...field, ...action.payload.field } : field
+        ),
+        updatedAt: new Date(),
+      };
+      const newState = {
+        ...state,
+        currentForm: updatedForm,
         selectedField: state.selectedField?.id === action.payload.id 
           ? { ...state.selectedField, ...action.payload.field } 
           : state.selectedField,
       };
+      return addToHistory(newState, updatedForm);
+    }
     
-    case 'DELETE_FIELD':
+    case 'DELETE_FIELD': {
       if (!state.currentForm) return state;
-      return {
+      const updatedForm = {
+        ...state.currentForm,
+        fields: state.currentForm.fields.filter(field => field.id !== action.payload),
+        updatedAt: new Date(),
+      };
+      const newState = {
         ...state,
-        currentForm: {
-          ...state.currentForm,
-          fields: state.currentForm.fields.filter(field => field.id !== action.payload),
-          updatedAt: new Date(),
-        },
+        currentForm: updatedForm,
         selectedField: state.selectedField?.id === action.payload ? null : state.selectedField,
       };
+      return addToHistory(newState, updatedForm);
+    }
     
-    case 'REORDER_FIELDS':
+    case 'REORDER_FIELDS': {
       if (!state.currentForm) return state;
+      const updatedForm = {
+        ...state.currentForm,
+        fields: action.payload,
+        updatedAt: new Date(),
+      };
+      const newState = {
+        ...state,
+        currentForm: updatedForm,
+      };
+      return addToHistory(newState, updatedForm);
+    }
+    
+    case 'TOGGLE_MULTI_STEP': {
+      if (!state.currentForm) return state;
+      const updatedForm = {
+        ...state.currentForm,
+        isMultiStep: !state.currentForm.isMultiStep,
+        steps: !state.currentForm.isMultiStep ? [
+          {
+            id: uuidv4(),
+            title: 'Step 1',
+            fields: [...state.currentForm.fields],
+          }
+        ] : undefined,
+        updatedAt: new Date(),
+      };
+      const newState = {
+        ...state,
+        currentForm: updatedForm,
+      };
+      return addToHistory(newState, updatedForm);
+    }
+    
+    case 'UNDO': {
+      if (!state.canUndo || state.historyIndex <= 0) return state;
+      
+      const newIndex = state.historyIndex - 1;
+      const previousForm = state.history[newIndex];
+      
       return {
         ...state,
-        currentForm: {
-          ...state.currentForm,
-          fields: action.payload,
-          updatedAt: new Date(),
-        },
+        currentForm: previousForm,
+        historyIndex: newIndex,
+        canUndo: newIndex > 0,
+        canRedo: true,
+        selectedField: null, // Clear selection when undoing
       };
+    }
+    
+    case 'REDO': {
+      if (!state.canRedo || state.historyIndex >= state.history.length - 1) return state;
+      
+      const newIndex = state.historyIndex + 1;
+      const nextForm = state.history[newIndex];
+      
+      return {
+        ...state,
+        currentForm: nextForm,
+        historyIndex: newIndex,
+        canUndo: true,
+        canRedo: newIndex < state.history.length - 1,
+        selectedField: null, // Clear selection when redoing
+      };    }
     
     case 'SELECT_FIELD':
       return { ...state, selectedField: action.payload };
@@ -128,24 +257,6 @@ const formBuilderReducer = (state: FormBuilderState, action: FormBuilderAction):
     
     case 'LOAD_FORMS':
       return { ...state, savedForms: action.payload };
-    
-    case 'TOGGLE_MULTI_STEP':
-      if (!state.currentForm) return state;
-      return {
-        ...state,
-        currentForm: {
-          ...state.currentForm,
-          isMultiStep: !state.currentForm.isMultiStep,
-          steps: !state.currentForm.isMultiStep ? [
-            {
-              id: uuidv4(),
-              title: 'Step 1',
-              fields: [...state.currentForm.fields],
-            }
-          ] : undefined,
-          updatedAt: new Date(),
-        },
-      };
     
     default:
       return state;
