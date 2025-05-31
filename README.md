@@ -516,9 +516,7 @@ localStorage.setItem('debug', 'form-builder:*');
 DEBUG=form-builder:* npm run dev
 ```
 
-## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -534,7 +532,7 @@ For support and questions:
 - 📖 Check the documentation above
 - 🐛 Report bugs via GitHub Issues
 - 💬 Discussions in GitHub Discussions
-- 📧 Contact: [your-email@example.com]
+- 📧 Contact: [tusharbailwal81@gmail.com]
 
 ---
 
