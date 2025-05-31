@@ -2,7 +2,7 @@ import React from 'react';
 import { FieldType } from '~/types/form';
 import { createField, getFieldIcon } from '~/utils/fieldUtils';
 import { useFormBuilder } from '~/context/FormBuilderContext';
-import { Icon } from './Icon';
+import { Icon } from '~/components/Icon';
 import clsx from 'clsx';
 
 const fieldTypes: { type: FieldType; label: string; description: string }[] = [
