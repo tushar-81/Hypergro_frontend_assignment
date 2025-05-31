@@ -183,21 +183,54 @@ const formBuilderReducer = (state: FormBuilderState, action: FormBuilderAction):
       };
       return addToHistory(newState, updatedForm);
     }
-    
-    case 'TOGGLE_MULTI_STEP': {
+      case 'TOGGLE_MULTI_STEP': {
       if (!state.currentForm) return state;
-      const updatedForm = {
-        ...state.currentForm,
-        isMultiStep: !state.currentForm.isMultiStep,
-        steps: !state.currentForm.isMultiStep ? [
-          {
-            id: uuidv4(),
-            title: 'Step 1',
-            fields: [...state.currentForm.fields],
-          }
-        ] : undefined,
-        updatedAt: new Date(),
-      };
+      
+      let updatedForm;
+      
+      if (!state.currentForm.isMultiStep) {
+        // Enabling multi-step: distribute fields across steps
+        const fieldsCount = state.currentForm.fields.length;
+        const targetSteps = Math.max(2, Math.min(3, Math.ceil(fieldsCount / 3))); // 2-3 steps based on field count
+        const fieldsPerStep = Math.ceil(fieldsCount / targetSteps);
+        
+        const updatedFields = state.currentForm.fields.map((field, index) => ({
+          ...field,
+          step: Math.floor(index / fieldsPerStep) + 1
+        }));
+        
+        const steps = Array.from({ length: targetSteps }, (_, i) => ({
+          id: uuidv4(),
+          title: `Step ${i + 1}`,
+          description: i === 0 ? 'Basic Information' : 
+                      i === 1 ? 'Additional Details' : 
+                      'Final Steps',
+          fields: [],
+        }));
+        
+        updatedForm = {
+          ...state.currentForm,
+          isMultiStep: true,
+          fields: updatedFields,
+          steps,
+          updatedAt: new Date(),
+        };
+      } else {
+        // Disabling multi-step: reset all fields to step 1
+        const updatedFields = state.currentForm.fields.map(field => ({
+          ...field,
+          step: 1
+        }));
+        
+        updatedForm = {
+          ...state.currentForm,
+          isMultiStep: false,
+          fields: updatedFields,
+          steps: undefined,
+          updatedAt: new Date(),
+        };
+      }
+      
       const newState = {
         ...state,
         currentForm: updatedForm,

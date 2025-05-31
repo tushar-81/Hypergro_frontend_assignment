@@ -157,8 +157,7 @@ export const predefinedTemplates: FormTemplate[] = [
     form: {
       title: 'Event Registration',
       description: 'Register for our upcoming event',
-      fields: [
-        {
+      fields: [        {
           id: 'first-name',
           type: 'text',
           label: 'First Name',
@@ -205,7 +204,7 @@ export const predefinedTemplates: FormTemplate[] = [
             { id: '5', label: 'Other', value: 'other' },
           ],
           validation: { required: true },
-          step: 1,
+          step: 2,
         },
         {
           id: 'special-requirements',
@@ -213,17 +212,16 @@ export const predefinedTemplates: FormTemplate[] = [
           label: 'Special Requirements',
           placeholder: 'Any accessibility needs or special requirements?',
           validation: {},
-          step: 1,
-        },
-        {
+          step: 2,
+        },        {
           id: 'agree-terms',
           type: 'checkbox',
           label: 'I agree to the terms and conditions',
           validation: { required: true },
-          step: 1,
+          step: 2,
         },
       ],
-      isMultiStep: false,
+      isMultiStep: true,
     },
   },
 ];
